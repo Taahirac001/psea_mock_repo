@@ -1,0 +1,21 @@
+# How the Northline Commerce web stack is wired (sanitized)
+# No real hosts. Used so code search finds related service names.
+
+client: northline-commerce
+environment: env-web-01
+
+services:
+  web-edge:
+    control: edge-access-control
+    evaluates: edge/access_control.py
+  web-app:
+    admin_path: /admin
+    depends_on: [web-edge, vault-service]
+  vault-service:
+    store: credential-vault
+    admin_secret: secret/clients/northline/env-web-01/admin
+
+# Informal ownership — not a directory of record
+contacts:
+  documented_owner: TBD
+  informal: Maya Chen

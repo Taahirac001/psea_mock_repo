@@ -1,0 +1,18 @@
+# Sanitized deploy descriptor. No live hosts, no secrets.
+environment: env-web-01
+client: northline-commerce
+display_name: Northline Commerce
+edge:
+  control: edge-access-control
+  admin_path: /admin
+  # Must match edge/access_control.py — not the Confluence page.
+  allowlist:
+    - 198.51.100.0/24
+origin:
+  app: web-app
+secrets:
+  store: credential-vault
+  admin_path: secret/clients/northline/env-web-01/admin
+owner:
+  documented: TBD
+  informal: Maya Chen
