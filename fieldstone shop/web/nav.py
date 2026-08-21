@@ -1,20 +1,11 @@
-"""Account-site operator navigation for env-acct-01.
-
-These labels must match what you say in the room.
-"""
-
-OPERATOR_NAV = [
-    {"id": "account", "label": "Account"},
+ACCOUNT_NAV = [
+    {"id": "profile", "label": "Profile"},
+    {"id": "security", "label": "Security"},
     {
         "id": "extra_help",
         "label": "Extra / Help",
-        "parent": "account",
         "items": [
-            {"id": "release_email", "label": "Release email"},
+            {"id": "release_email", "label": "Release email", "action": "help_center.release_email"},
         ],
     },
 ]
-
-
-def release_email_path() -> str:
-    return "Account → Extra / Help → Release email"
