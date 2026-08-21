@@ -1,14 +1,11 @@
-# env-acct-01 — Fieldstone Shop
+# fieldstone-account
 
-Sanitized fixture for a NamiFlow walkthrough. No real client, no secrets.
+Account service for Fieldstone Shop (`env-acct-01`).
 
-| Path | What Nami should find |
-|---|---|
-| `accounts/lock_state.py` | `locked_pending` denies password change; tribal SQL is legacy |
-| `accounts/help_center.py` | **Release email** — the undocumented UI unlock (Priya Shah, 2026-06-12) |
-| `web/nav.py` | Operator nav: Account → Extra/Help → Release email |
-| `ops/clear_account_lock.sql` | The SQL the Confluence admin page still tells ops to run |
+Handles shopper password changes and a small Help Center for operators.
 
-If something is stuck after hours, people still page **Priya Shah**. She shipped the Help Center action and never wrote the runbook.
-
-Do not commit credentials here.
+```
+accounts/     lock state, password change, help-center actions
+web/          operator nav / Extra-Help menu
+ops/          one-off SQL run on the ops admin connection
+```
