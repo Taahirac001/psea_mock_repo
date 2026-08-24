@@ -1,7 +1,6 @@
 """Edge access control for Northline Commerce env-web-01 admin path.
 
-The Confluence runbook "Northline Commerce — Edge access control" still lists
-203.0.113.0/24. This file is what is actually deployed.
+Written 2021 (M. Chen) as part of the original env-web-01 build.
 """
 
 from ipaddress import ip_address, ip_network
@@ -9,14 +8,11 @@ from ipaddress import ip_address, ip_network
 CONTROL_NAME = "edge-access-control"
 ADMIN_PREFIXES = ("/admin",)
 
-# Maya Chen changed this on 2026-05-19. The support NAT moved.
-# Documented CIDR on the runbook page was never updated.
+# 2026-05-19 Maya Chen: replaced the previous range after the egress change.
+# Context is in my notes; will write it up properly later.
 ALLOWLIST = (
     ip_network("198.51.100.0/24"),
 )
-
-# Vault is the live secret store. Spreadsheet in the access doc is stale.
-VAULT_SECRET_PATH = "secret/clients/northline/env-web-01/admin"
 
 
 def is_admin_path(path: str) -> bool:

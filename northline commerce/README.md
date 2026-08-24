@@ -1,14 +1,20 @@
-# env-web-01 — Northline Commerce
+# env-web-01 — Northline Commerce (sanitized)
 
-Sanitized fixture for a NamiFlow walkthrough. No real client, no secrets.
+Web environment for Northline Commerce. Built by our platform team in 2021
+and operated by us since. Northline does not run or administer this stack.
 
-| Path | What Nami should be able to find |
+| Path | What it is |
 |---|---|
-| `edge/access_control.py` | Deployed allowlist `198.51.100.0/24` (contradicts Confluence) |
-| `deploy/env-web-01.yml` | Same allowlist + vault path + owner TBD / Maya Chen |
-| `ops/verify_edge_allowlist.sql` | On-call verification query (manual; values are inputs) |
-| `config/service_map.yml` | How edge, vault, and app relate |
+| `edge/access_control.py` | Edge allowlist for the `/admin` path |
+| `edge/admin_gate.py` | Admin sign-in gate — retrieves the admin credential from the internal vault (fail-closed) |
+| `deploy/env-web-01.yml` | Deploy descriptor (edge + origin + secrets store) |
+| `config/service_map.yml` | How edge, app, and vault relate |
+| `ops/verify_edge_allowlist.sql` | Read-only ops check of deployed allowlist rows |
 
-If you need production admin access, ask **Maya Chen**. She knows the vault path and why the edge allowlist looks the way it does.
+Admin credentials are vault-only. Nothing in this repo contains or caches a
+credential.
+
+If you need to touch the edge rule or the vault integration, talk to
+**Maya Chen** first — she built both and the write-up is still on her list.
 
 Do not commit credentials here.

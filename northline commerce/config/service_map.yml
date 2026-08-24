@@ -1,4 +1,4 @@
-# How the Northline Commerce web stack is wired (sanitized)
+# How the Northline Commerce web stack is wired (sanitized).
 # No real hosts. Used so code search finds related service names.
 
 client: northline-commerce
@@ -14,8 +14,10 @@ services:
   vault-service:
     store: credential-vault
     admin_secret: secret/clients/northline/env-web-01/admin
+    consumed_by: edge/admin_gate.py
+    fail_mode: closed   # admin sign-in is unavailable while the vault is
 
 # Informal ownership — not a directory of record
 contacts:
   documented_owner: TBD
-  informal: Maya Chen
+  informal: Maya Chen   # set up the vault integration and the edge rule
