@@ -14,6 +14,7 @@ administer this stack.
 | `ops/quarantine_blocking_event.py` | Operator recovery for a head-of-line block. Runtime data only — no deploy |
 | `deploy/env-web-01.yml` | Deploy descriptor |
 | `config/service_map.yml` | How the four services relate |
+| `edge/`, `ops/verify_edge_allowlist.sql` | Retired. The merchant admin path moved behind the shared platform gateway; nothing in the order pipeline reads any of it |
 
 ## Orders stuck in `payment_pending`
 
@@ -31,5 +32,3 @@ for an order that was cancelled.
 Do not "fix" this by making the drain skip events or by turning off
 `STOP_ON_ERROR`. Out-of-order application is what those guards exist to
 prevent, and it has cost us double fulfilment before.
-
-Do not commit credentials here.
