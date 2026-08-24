@@ -8,14 +8,16 @@ services:
   web-edge:
     control: edge-access-control
     evaluates: edge/access_control.py
+    depends_on: [vault-service]   # verifier key fetch; fail-closed since 2026-05
   web-app:
     admin_path: /admin
     depends_on: [web-edge, vault-service]
   vault-service:
     store: credential-vault
     admin_secret: secret/clients/northline/env-web-01/admin
-    consumed_by: edge/admin_gate.py
-    fail_mode: closed   # admin sign-in is unavailable while the vault is
+    verifier_key: secret/clients/northline/env-web-01/edge-verifier
+    consumed_by: [edge/admin_gate.py, edge/access_control.py]
+    fail_mode: closed   # admin sign-in and admin-path verification both wait on the vault
 
 # Informal ownership — not a directory of record
 contacts:

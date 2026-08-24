@@ -7,7 +7,9 @@ edge:
   control: edge-access-control
   admin_path: /admin
   allowlist:
-    - 198.51.100.0/24
+    - 203.0.113.0/24
+  verifier_key: secret/clients/northline/env-web-01/edge-verifier
+  verifier_fail_mode: closed   # since 2026-05: no verifier key = deny, even for allowlisted IPs
 origin:
   app: web-app
 secrets:

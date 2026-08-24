@@ -5,7 +5,7 @@ and operated by us since. Northline does not run or administer this stack.
 
 | Path | What it is |
 |---|---|
-| `edge/access_control.py` | Edge allowlist for the `/admin` path |
+| `edge/access_control.py` | Edge control for the `/admin` path — support allowlist plus vault-backed session verification |
 | `edge/admin_gate.py` | Admin sign-in gate — retrieves the admin credential from the internal vault (fail-closed) |
 | `deploy/env-web-01.yml` | Deploy descriptor (edge + origin + secrets store) |
 | `config/service_map.yml` | How edge, app, and vault relate |
