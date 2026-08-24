@@ -1,25 +1,34 @@
-# How the Northline Commerce web stack is wired (sanitized).
+# How the Northline Commerce order pipeline is wired (sanitized).
 # No real hosts. Used so code search finds related service names.
 
 client: northline-commerce
 environment: env-web-01
+owner_team: dev-platform
 
 services:
-  web-edge:
-    control: edge-access-control
-    evaluates: edge/access_control.py
-    depends_on: [vault-service]   # verifier key fetch; fail-closed since 2026-05
-  web-app:
-    admin_path: /admin
-    depends_on: [web-edge, vault-service]
-  vault-service:
-    store: credential-vault
-    admin_secret: secret/clients/northline/env-web-01/admin
-    verifier_key: secret/clients/northline/env-web-01/edge-verifier
-    consumed_by: [edge/admin_gate.py, edge/access_control.py]
-    fail_mode: closed   # admin sign-in and admin-path verification both wait on the vault
+  checkout-web:
+    role: storefront and checkout
+    writes: [orders]
+    depends_on: [order-api, payments-api]
+  payments-api:
+    role: provider callbacks, payment records, outbox append
+    handles: payments/capture_handler.py
+    writes: [payments, payment_events]
+    changes_order_state: false        # deliberate — see capture_handler.py
+  fulfillment-worker:
+    role: applies payment events to orders
+    drains: payment_events
+    applies: fulfillment/event_drain.py
+    cursor: payment_events_cursor     # single global cursor, strict seq order
+    on_unappliable_event: stop        # never skips, never advances past it
+  order-api:
+    role: order reads and cancellations
+    state_machine: orders/state_machine.py
 
-# Informal ownership — not a directory of record
-contacts:
-  documented_owner: TBD
-  informal: Maya Chen   # set up the vault integration and the edge rule
+# Shared failure mode worth knowing before you page anyone: an order stuck in
+# payment_pending with a captured payment is almost never a payments-api or a
+# provider problem. Both of those look healthy while it happens. It means the
+# fulfilment drain is not advancing, and the drain does not advance while the
+# event at the head of payment_events cannot be applied.
+# Read the head event (ops/stuck_orders.sql) then follow
+# ops/quarantine_blocking_event.py. Runtime data only; no deploy.

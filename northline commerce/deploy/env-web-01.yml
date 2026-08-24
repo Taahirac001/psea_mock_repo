@@ -1,22 +1,35 @@
 # Deploy descriptor for env-web-01 (sanitized — no live hosts, no secrets).
-# Environment built 2021 by our platform team; operated by us since.
+# Northline Commerce storefront, checkout, and order pipeline.
+# Built 2021 by our platform team; operated by us since.
 environment: env-web-01
 client: northline-commerce
 display_name: Northline Commerce
-edge:
-  control: edge-access-control
-  admin_path: /admin
-  allowlist:
-    - 203.0.113.0/24
-  verifier_key: secret/clients/northline/env-web-01/edge-verifier
-  verifier_fail_mode: closed   # since 2026-05: no verifier key = deny, even for allowlisted IPs
-origin:
-  app: web-app
-secrets:
-  store: credential-vault
-  admin_path: secret/clients/northline/env-web-01/admin
-  retrieval_timeout_ms: 2000
-  fail_mode: closed   # no cached fallback — admin waits if the vault is down
+
+storefront:
+  service: checkout-web
+  public_paths: [/, /cart, /checkout]
+
+payments:
+  service: payments-api
+  provider_callback_path: /callbacks/payments
+  records: [payments, payment_events]
+  # This service never changes order state. See payments/capture_handler.py.
+
+fulfillment:
+  service: fulfillment-worker
+  applies: fulfillment/event_drain.py
+  source: payment_events
+  cursor: payment_events_cursor      # one global cursor, strict seq order
+  dead_letter: payment_events_dead_letter
+  batch_size: 200
+  on_unappliable_event: stop         # do not skip, do not advance the cursor
+  # Consequence: one unappliable event holds every event behind it. Clearing
+  # it is an operator action, not a deploy — ops/quarantine_blocking_event.py.
+
+orders:
+  service: order-api
+  state_machine: orders/state_machine.py
+  terminal_states: [fulfilled, cancelled]
+
 owner:
-  documented: TBD
-  informal: Maya Chen
+  team: dev-platform
