@@ -33,6 +33,9 @@ def claim_batch(db, after_seq: int, limit: int):
 
 def dead_letter(db, seq: int, reason: str) -> None:
     """Move one event out of the stream, keeping the original row and why."""
+    # Only ops/quarantine_blocking_event.py calls this, and it refuses to run
+    # until the order's refund state is checked. Runs as the pipeline role --
+    # ad-hoc sessions have no write grants on these tables.
     db.execute(
         f"INSERT INTO {DEAD_LETTER_TABLE} "
         f"(seq, order_id, event_type, payload, created_at, reason, quarantined_at) "
