@@ -1,15 +1,4 @@
-"""Order states and the transitions that are allowed between them.
-
-An order's state is only ever changed here. The fulfilment worker applies
-payment events through apply_event(); nothing else writes order.state.
-
-`cancelled` is terminal on purpose. Once an order is cancelled nothing may
-move it forward again -- not a capture, not a fulfilment. A capture that
-arrives for a cancelled order is a real situation (the customer cancelled
-while the provider callback was already in flight) and it is money that has
-to be dealt with on the payments side; it is NOT something this state
-machine is allowed to paper over by advancing the order anyway.
-"""
+"""Order states and the transitions allowed between them."""
 
 CREATED = "created"
 AUTHORIZED = "authorized"
@@ -27,7 +16,9 @@ TRANSITIONS = {
     PAID: {"fulfilment.started": FULFILLING},
     FULFILLING: {"fulfilment.completed": FULFILLED},
     FULFILLED: {},
-    CANCELLED: {},  # terminal — see module docstring
+    # cancelled is terminal -- applying a capture here would resurrect a dead
+    # order. A late capture is money to deal with on the payments side.
+    CANCELLED: {},
 }
 
 

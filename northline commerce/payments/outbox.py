@@ -1,15 +1,4 @@
-"""The payment_events outbox and its single cursor.
-
-payments-api appends events here when the provider tells us something
-happened. fulfillment-worker reads them in `seq` order and advances the
-cursor. There is exactly one cursor for the whole stream -- ordering is
-global, not per order, so the cursor cannot advance past an event that
-cannot be applied.
-
-Nothing in this module skips an event. Moving an event out of the stream is
-an operator action (ops/quarantine_blocking_event.py), never an automatic
-one.
-"""
+"""The payment_events outbox and its single global cursor."""
 
 CURSOR_TABLE = "payment_events_cursor"
 EVENTS_TABLE = "payment_events"

@@ -1,18 +1,4 @@
-"""Records what the payment provider tells us, and nothing else.
-
-This service is deliberately dumb: it verifies the callback signature,
-records the payment row, and either applies the pre-capture state inline or
-appends an event to the outbox.
-
-  * authorize / pending -- applied inline. Nothing is money-final yet and
-    there is no ordering risk, so checkout does not have to wait on a worker.
-  * capture / refund -- appended to `payment_events` and applied by the
-    fulfilment worker in strict order (fulfillment/event_drain.py). These are
-    money-final and must never be applied out of order.
-
-A capture recorded here proves the money moved. It does not change order
-state, and it does not prove the order advanced.
-"""
+"""Records provider payment callbacks; money-final events go to the outbox."""
 
 import logging
 
@@ -20,7 +6,10 @@ from payments.outbox import EVENTS_TABLE
 
 log = logging.getLogger("payments-api")
 
+# Applied inline at request time -- not money-final, no ordering risk.
 INLINE_EVENTS = ("payment.authorized", "payment.pending")
+# Money-final: appended to payment_events, applied by fulfillment/event_drain.py
+# in strict seq order.
 OUTBOX_EVENTS = ("payment.captured", "payment.refunded")
 
 
