@@ -1,4 +1,9 @@
+"""Dead-letter one unappliable payment event and advance the cursor past it.
 
+Refuses to run until the blocking order's refund state has been checked
+(--refund-confirmed). Requires --env and --seq; only the head-of-line event
+can be quarantined.
+"""
 import argparse
 
 from payments.outbox import connect, current_cursor, dead_letter, set_cursor
