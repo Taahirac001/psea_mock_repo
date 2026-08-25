@@ -1,4 +1,9 @@
-"""Move one unappliable payment event out of the drain and advance the cursor."""
+"""Dead-letter one unappliable payment event and advance the cursor past it.
+
+Refuses to run until the blocking order's refund state has been checked
+(--refund-confirmed). Requires --env and --seq; only the head-of-line event
+can be quarantined.
+"""
 
 import argparse
 
