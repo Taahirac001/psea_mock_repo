@@ -1,5 +1,5 @@
 # How the Northline Commerce order pipeline is wired (sanitized).
-# No real hosts. Used so code search finds related service names.
+
 
 client: northline-commerce
 environment: env-web-01
