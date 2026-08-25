@@ -10,10 +10,8 @@ appends an event to the outbox.
     fulfilment worker in strict order (fulfillment/event_drain.py). These are
     money-final and must never be applied out of order.
 
-So the only thing that moves an order out of `payment_pending` is the drain.
-That split is why a stuck-order incident shows healthy logs here: a capture
-recorded on this side proves the money moved, and proves nothing at all about
-whether the order advanced.
+A capture recorded here proves the money moved. It does not change order
+state, and it does not prove the order advanced.
 """
 
 import logging

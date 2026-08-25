@@ -7,31 +7,14 @@ single shared cursor in `payment_events_cursor`.
 
 The outbox carries the money-final events only -- capture and refund.
 Authorize and pending are applied inline by payments-api at request time, so
-an order reaches `payment_pending` without this worker being involved. It
-takes the drain to get any further than that.
+an order reaches `payment_pending` without this worker being involved.
 
-WHY STRICTLY ORDERED, AND WHY IT STOPS INSTEAD OF SKIPPING
-----------------------------------------------------------
 Events for the same order must land in the order the provider produced them
 (authorize -> capture -> refund). Applying a later event before an earlier
-one corrupts order state and, historically, produced double fulfilment. So
-the drain holds one global cursor and, when an event cannot be applied, it
-STOPS. It does not skip the event, and it does not advance the cursor past
+one corrupts order state and, historically, produced double fulfilment. The
+drain holds one global cursor and, when an event cannot be applied, it
+stops: it does not skip the event, and it does not advance the cursor past
 it. See the 2025-09 change note.
-
-The cost of that guarantee: ONE event that can never be applied blocks every
-event behind it. The pipeline is still healthy, the worker is still running
-and heart-beating, captures are still being recorded by payments-api -- but
-no order advances, and the backlog grows for as long as the head event sits
-there. On the storefront that looks like "charged but still awaiting
-payment", on more and more orders.
-
-If you are here because orders are stuck in `payment_pending`: read the
-head-of-line event out of the log (`apply failed seq=<n> order=<id>`) or
-with ops/stuck_orders.sql, then follow ops/quarantine_blocking_event.py.
-Do NOT change RETRY_FOREVER or STOP_ON_ERROR to clear an incident -- both
-exist to keep events from being applied out of order, and turning either off
-trades a stuck queue for silently corrupted orders.
 """
 
 import logging
