@@ -23,8 +23,6 @@ fulfillment:
   dead_letter: payment_events_dead_letter
   batch_size: 200
   on_unappliable_event: stop         # do not skip, do not advance the cursor
-  # Consequence: one unappliable event holds every event behind it. Clearing
-  # it is an operator action, not a deploy — ops/quarantine_blocking_event.py.
 
 orders:
   service: order-api

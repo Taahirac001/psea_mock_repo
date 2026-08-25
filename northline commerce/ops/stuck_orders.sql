@@ -1,7 +1,7 @@
 -- Read-only checks for orders stuck in payment_pending.
 -- Run against the orders reporting replica. Nothing here writes.
 
--- 1. How bad is it, and since when.
+-- 1. Stuck-order count
 SELECT count(*)                AS stuck_orders,
        min(o.updated_at)       AS oldest_stuck,
        max(o.updated_at)       AS newest_stuck
@@ -11,8 +11,7 @@ WHERE o.state = 'payment_pending'
               WHERE p.order_id = o.id AND p.capture_state = 'captured');
 
 
--- 2. The head-of-line event: the first unapplied event after the cursor.
---    This is the one event that is holding up everything behind it.
+-- 2. Head-of-line event (first unapplied event after the cursor)
 SELECT e.seq,
        e.order_id,
        e.event_type,
@@ -26,10 +25,7 @@ ORDER BY e.seq
 LIMIT 1;
 
 
--- 3. Money state for the blocking order — the step-0 check in
---    ops/quarantine_blocking_event.py. If capture_state = 'captured' and no
---    refund row comes back, that customer is still holding the charge and
---    the refund has to be raised BEFORE the event is quarantined.
+-- 3. Money state for one order
 SELECT p.order_id,
        o.state                 AS order_state,
        p.auth_state,
@@ -43,4 +39,4 @@ SELECT p.order_id,
 FROM payments p
 JOIN orders o  ON o.id = p.order_id
 LEFT JOIN refunds r ON r.order_id = p.order_id
-WHERE p.order_id = :order_id;          -- e.g. 'ord-48120'
+WHERE p.order_id = :order_id;

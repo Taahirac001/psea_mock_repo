@@ -24,11 +24,3 @@ services:
   order-api:
     role: order reads and cancellations
     state_machine: orders/state_machine.py
-
-# Shared failure mode worth knowing before you page anyone: an order stuck in
-# payment_pending with a captured payment is almost never a payments-api or a
-# provider problem. Both of those look healthy while it happens. It means the
-# fulfilment drain is not advancing, and the drain does not advance while the
-# event at the head of payment_events cannot be applied.
-# Read the head event (ops/stuck_orders.sql) then follow
-# ops/quarantine_blocking_event.py. Runtime data only; no deploy.
