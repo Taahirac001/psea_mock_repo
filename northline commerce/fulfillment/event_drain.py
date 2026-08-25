@@ -30,9 +30,10 @@ BATCH_SIZE = 200
 STOP_ON_ERROR = True
 RETRY_FOREVER = True
 
-# Events that are known to be unappliable are moved here by an operator, not
-# by this worker. The worker never quarantines anything on its own -- a
-# transient failure that quarantined itself would be an event silently lost.
+# Events that are known to be unappliable are moved here by an operator
+# (ops/quarantine_blocking_event.py), not by this worker. The worker never
+# quarantines anything on its own -- a transient failure that quarantined
+# itself would be an event silently lost.
 DEAD_LETTER_TABLE = "payment_events_dead_letter"
 
 

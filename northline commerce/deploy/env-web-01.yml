@@ -21,6 +21,7 @@ fulfillment:
   source: payment_events
   cursor: payment_events_cursor      # one global cursor, strict seq order
   dead_letter: payment_events_dead_letter
+  operator_tool: ops/quarantine_blocking_event.py   # runtime data, no deploy
   batch_size: 200
   on_unappliable_event: stop         # do not skip, do not advance the cursor
 

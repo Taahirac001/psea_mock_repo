@@ -9,8 +9,8 @@ REASON = "illegal_transition: event cannot be applied to order in its current st
 
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__.splitlines()[0])
-    parser.add_argument("--env", required=True)
-    parser.add_argument("--seq", required=True, type=int)
+    parser.add_argument("--env", required=True, help="target environment, e.g. env-web-01")
+    parser.add_argument("--seq", required=True, type=int, help="seq of the event to quarantine")
     parser.add_argument(
         "--refund-confirmed",
         action="store_true",
@@ -19,7 +19,11 @@ def main() -> int:
     args = parser.parse_args()
 
     if not args.refund_confirmed:
-        print("ABORT: --refund-confirmed is required")
+        print(
+            "ABORT: refusing to quarantine a money-final event until the "
+            "order's refund state has been checked. Re-run with "
+            "--refund-confirmed."
+        )
         return 1
 
     db = connect(args.env)

@@ -1,5 +1,7 @@
 -- Read-only checks for orders stuck in payment_pending.
--- Run against the orders reporting replica. Nothing here writes.
+-- Run against the orders reporting replica. Nothing here writes, and ad-hoc
+-- sessions have no write grants on the pipeline tables on the primary
+-- either -- runtime changes go through the ops/ tooling.
 
 -- 1. Stuck-order count
 SELECT count(*)                AS stuck_orders,

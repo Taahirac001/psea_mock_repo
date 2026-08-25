@@ -7,7 +7,8 @@ global, not per order, so the cursor cannot advance past an event that
 cannot be applied.
 
 Nothing in this module skips an event. Moving an event out of the stream is
-an operator action, never an automatic one.
+an operator action (ops/quarantine_blocking_event.py), never an automatic
+one.
 """
 
 CURSOR_TABLE = "payment_events_cursor"
@@ -27,6 +28,9 @@ def current_cursor(db) -> int:
 
 
 def set_cursor(db, seq: int) -> None:
+    # claim_batch never reads at or below the cursor: moving it past a live
+    # event abandons that event with no record. Only
+    # ops/quarantine_blocking_event.py does that, and it dead-letters first.
     db.execute(f"UPDATE {CURSOR_TABLE} SET seq = :seq", {"seq": seq})
 
 
