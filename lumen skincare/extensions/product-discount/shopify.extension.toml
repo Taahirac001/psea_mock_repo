@@ -1,0 +1,15 @@
+api_version = "2025-01"
+
+[[extensions]]
+name = "product-discount"
+handle = "product-discount"
+type = "function"
+
+[[extensions.targeting]]
+target = "purchase.product-discount.run"
+input_query = "src/run.graphql"
+export = "run"
+
+[extensions.build]
+command = ""
+path = "dist/function.wasm"

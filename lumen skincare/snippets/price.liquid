@@ -1,0 +1,5 @@
+{% if product.price == product.compare_at_price or product.compare_at_price == 0 %}
+  <span class="price">{{ product.price | money }}</span>
+{% else %}
+  <span class="price price--sale">{{ product.price | money }}</span>
+{% endif %}

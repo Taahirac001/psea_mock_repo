@@ -1,0 +1,9 @@
+{
+  "current": {
+    "color_ink": "#1b1b1b",
+    "sections": {
+      "header": { "type": "header", "settings": {} },
+      "footer": { "type": "footer", "settings": {} }
+    }
+  }
+}

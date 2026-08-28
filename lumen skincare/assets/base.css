@@ -1,0 +1,10 @@
+:root {
+  --lumen-ink: #1b1b1b;
+  --lumen-paper: #f7f3ee;
+}
+
+body {
+  color: var(--lumen-ink);
+  background: var(--lumen-paper);
+  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+}
