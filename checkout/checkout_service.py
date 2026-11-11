@@ -1,8 +1,8 @@
-"""Checkout Service — handles cart-to-order conversion.
 
-Retries connection acquisition before processing the checkout.
-The acquired connection is released when processing finishes.
-"""
+
+
+
+
 
 import time
 from typing import Any
@@ -18,7 +18,7 @@ class CheckoutService:
         self.retry_delay_ms = 200
 
     def process_checkout(self, cart: dict, user_id: str) -> dict[str, Any]:
-        """Convert cart to order. Acquires DB connection for the full transaction."""
+
         conn = None
         for attempt in range(self.max_retries):
             try:
@@ -30,7 +30,7 @@ class CheckoutService:
                 time.sleep(self.retry_delay_ms / 1000)
 
         try:
-            # Use the same connection for stock checks, order writes, and payment
+
             stock_result = verify_stock(cart["items"], conn=conn)
             if not stock_result["available"]:
                 return {"status": "failed", "reason": "out_of_stock", "items": stock_result["unavailable"]}
@@ -46,7 +46,7 @@ class CheckoutService:
             return {"status": "success", "order_id": order_id}
         finally:
             if conn:
-                conn.release()  # Connection held for entire flow duration
+                conn.release()
 
     def _create_order(self, conn, cart: dict, user_id: str) -> str:
         result = conn.execute(
@@ -60,3 +60,4 @@ class CheckoutService:
 
     def _rollback_order(self, conn, order_id: str) -> None:
         conn.execute("UPDATE orders SET status = 'CANCELLED' WHERE id = %s", (order_id,))
+
