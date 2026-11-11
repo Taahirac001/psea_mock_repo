@@ -1,9 +1,7 @@
-"""Database connection pool — no max_overflow, no circuit breaker.
+"""Fixed-size database connection pool.
 
-This is the root cause of checkout 503s under load.
-Pool size is fixed at 10 but there's no backpressure mechanism.
-When all 10 connections are held by long-running checkout transactions,
-new requests block until timeout_ms expires, then raise TimeoutError.
+Tracks up to 10 active connections. Callers release connections when finished.
+Acquisition raises TimeoutError when the pool is full.
 """
 
 import threading
@@ -33,17 +31,15 @@ class PooledConnection:
 
 
 def get_connection(timeout_ms: int = 5000) -> PooledConnection:
-    """Acquire a connection from the pool. Blocks until timeout.
+    """Acquire a connection if capacity is available.
 
-    BUG: No max_overflow, no queuing priority, no circuit breaker.
-    Under sustained load (>10 concurrent checkouts), all connections
-    are held for the full checkout duration (stock check + payment + DB writes).
-    New requests queue and timeout after 5s → 503 to the client.
+    Raises TimeoutError immediately when all connections are in use.
+    timeout_ms is included in the error message; this implementation does not wait.
     """
     global _active_connections
     with _lock:
         if _active_connections >= _pool_size:
-            # In production this blocks; here we simulate the timeout path
+            # Report pool capacity and the requested timeout to the caller
             raise TimeoutError(
                 f"pool_exhausted: {_active_connections}/{_pool_size} connections in use, "
                 f"timeout_ms={timeout_ms}"

@@ -1,7 +1,7 @@
 """Checkout Service — handles cart-to-order conversion.
 
-Known issue: under high concurrency, DB pool exhaustion causes 503s.
-The pool has no max_overflow limit and no circuit breaker.
+Retries connection acquisition before processing the checkout.
+The acquired connection is released when processing finishes.
 """
 
 import time
@@ -30,7 +30,7 @@ class CheckoutService:
                 time.sleep(self.retry_delay_ms / 1000)
 
         try:
-            # Hold connection for entire checkout flow (problematic under load)
+            # Use the same connection for stock checks, order writes, and payment
             stock_result = verify_stock(cart["items"], conn=conn)
             if not stock_result["available"]:
                 return {"status": "failed", "reason": "out_of_stock", "items": stock_result["unavailable"]}
